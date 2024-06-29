@@ -28,11 +28,18 @@
 
 1. Конфигурирование выполнялось в yandex cloud, под установку clickhouse и vector поднята дополнительная vm на debian (c vm1 (ansible) на vm2 проброшен id_rsa.pub в ~/.ssh/authorized_keys).
 2. Для подключению по ssh использовал серые ip-адреса, так ноды всё равно находятся в одной подсети.
+<img src="img/playbook_02.png">
 3. Playbook устанавливает сервисы clickhouse и vector (ориентированные на deb) используя переменные описанные в group_vars и создаёт БД с именем logs.
 
 пример команды запуска:
 ```bash
 ansible-playbook -i inventory/myprod.yml playbook/clikhouse_vektor_install.yml 
+```
+
+создан необходимый тег:
+```bash
+git tag -a 08-ansible-02-playbook 8fe737638d4392655520b217fdcc3633cf4062bd -m "add tag"
+git push origin --tags 
 ```
 
 ---
