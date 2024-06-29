@@ -1,0 +1,12 @@
+---
+
+clickhouse:
+  hosts:
+    clickhouse-01:
+      ansible_host: 10.129.0.23
+      ansible_user: dmlorren
+vector:
+  hosts:
+    vector-01:
+      ansible_host: 10.129.0.23
+      ansible_user: dmlorren
