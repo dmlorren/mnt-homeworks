@@ -1,4 +1,4 @@
-# Домашнее задание к занятию 3 «Использование Ansible»
+# Домашнее задание к занятию 3 «Использование Ansible» - Иванов Дмитрий (fops-13)
 
 ## Подготовка к выполнению
 
@@ -20,8 +20,31 @@
 
 ---
 
-### Как оформить решение задания
+## Решение задачи 1
 
-Выполненное домашнее задание пришлите в виде ссылки на .md-файл в вашем репозитории.
+### Итоговый резльтат:
+<img src="img/yandex_01.png">
+
+пример команды запуска:
+```bash
+ansible-playbook -i playbook/inventory/myprod.yml playbook/install.yml 
+```
+
+- Для работы был взят плейбук из предыдущего задания и доработан под поставленные задачи из этого упражния.
+- Конфигурирование выполнялось в yandex cloud, под установку clickhouse и vector, lighthouse, nginx поднята дополнительная vm на debian (c vm1 (ansible) на vm2 проброшен id_rsa.pub в ~/.ssh/authorized_keys).
+
+### Краткое резюме задач
+**Get clickhouse distrib**: Скачивает пакеты ClickHouse.
+**Install clickhouse packages** Устанавливает пакеты ClickHouse и перезапускает сервис.
+**Get Vector**: Скачивает пакет Vector.
+**Install Vector**: Устанавливает пакет Vector и перезапускает сервис.
+**Flush handlers**: Немедленно запускает все уведомленные хендлеры.
+**Create database**: Создает базу данных logs в ClickHouse.
+**Install nginx**: Устанавливает веб-сервер nginx.
+**Install git**: Устанавливает утилиту git (иначе не сможем скачать lighthouse).
+**Download lighthouse**: Клонирует репозиторий Lighthouse.
+**Fix owner and mode**: Устанавливает права доступа для директории Lighthouse.
+**nginx config**: Копирует конфигурационный файл nginx для Lighthouse.
+**Symlink to sites-enabled**: Создает символическую ссылку на конфигурационный файл и перезапускает сервис nginx.
 
 ---
