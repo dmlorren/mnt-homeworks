@@ -1,0 +1,97 @@
+---
+- name: Install Clickhouse
+  hosts: clickhouse
+  handlers:
+    - name: Start clickhouse service
+      become: true
+      ansible.builtin.service:
+        name: clickhouse-server
+        state: restarted
+    - name: Start Vector service
+      become: true
+      ansible.builtin.service:
+        name: vector
+        state: restarted
+  tasks:
+    - name: Get clickhouse distrib
+      ansible.builtin.get_url:
+        url: "https://packages.clickhouse.com/deb/pool/main/c/{{ item.name }}/{{ item.name }}_{{ clickhouse_version }}_{{ item.arch }}.deb"
+        dest: "/tmp/{{ item.name }}-{{ clickhouse_version }}.deb"
+      with_items: "{{ clickhouse_packages }}"
+    - name: Install clickhouse packages
+      become: true
+      ansible.builtin.apt:
+        deb: "/tmp/{{ item.name }}-{{ clickhouse_version }}.deb"
+      with_items: "{{ clickhouse_packages }}"
+      notify: Start clickhouse service
+
+    - name: Get Vector
+      ansible.builtin.get_url:
+        url: "https://packages.timber.io/{{ vector_package }}/{{ vector_version }}/{{ vector_package }}_{{ vector_version }}-1_amd64.deb"
+        dest: "/tmp/{{ vector_package }}-{{ vector_version }}.deb"
+    - name: Install Vector
+      become: true
+      ansible.builtin.apt:
+        deb: "/tmp/{{ vector_package }}-{{ vector_version }}.deb"
+      notify: Start Vector service
+
+    - name: Flush handlers
+      meta: flush_handlers
+    - name: Create database
+      ansible.builtin.command: "clickhouse-client -q 'create database logs;'"
+      register: create_db
+      failed_when: create_db.rc != 0 and create_db.rc !=82
+      changed_when: create_db.rc == 0
+
+
+# блок для домашней работы №3       
+  tasks:
+    - name: Install nginx
+      become: true
+      ansible.builtin.apt:
+        name: nginx
+
+    - name: Install git
+      become: true
+      ansible.builtin.apt:
+        name: git    
+
+    - name: Download lighthouse
+      become: true
+      ansible.builtin.git:
+        repo: https://github.com/VKCOM/lighthouse.git
+        dest: /var/www/lighthouse
+        update: no
+    
+    - name: Fix owner and mode
+      become: true
+      ansible.builtin.file:
+        path: /var/www/lighthouse
+        state: directory
+        mode: '0755'
+        owner: www-data
+    
+    - name: nginx config
+      become: true
+      ansible.builtin.template:
+        src: temp/lighthouse.j2
+        dest: /etc/nginx/sites-available/lighthouse
+        owner: www-data
+    
+    - name: Symlink to sites-enabled
+      become: true
+      ansible.builtin.file:
+        src: /etc/nginx/sites-available/lighthouse
+        dest: /etc/nginx/sites-enabled/lighthouse
+        state: link
+      notify: Start nginx service
+
+  handlers:
+    - name: Start nginx service
+      become: true
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
+        
+  tags:
+    - lighthouse
