@@ -49,13 +49,13 @@
 4. Создали задачу epic прикрепили таски, провели по новому workflow
 <img src="img/CI09_04.png">
 <img src="img/CI09_05.png">
-5. Создали скрам в нашем проекте из бэклога прокинули задачи, прогнали через статусы? спринт завершён успешно.
+5. Создали скрам в нашем проекте из бэклога прокинули задачи, прогнали через статусы, спринт завершён успешно.
 <img src="img/CI09_06.png">
 <img src="img/CI09_07.png">
 
 ### Экспортированные xml:
-[all_requests_except_bug.xml](https://github.com/dmlorren/mnt-homeworks/blob/MNT-video/09-ci-01-intro/xml/all_requests_except_bug.xml))
-[workflow_for_bug.xml](https://github.com/dmlorren/mnt-homeworks/blob/MNT-video/09-ci-01-intro/xml/workflow_for_bug.xml))
+[all_requests_except_bug.xml](https://github.com/dmlorren/mnt-homeworks/blob/MNT-video/09-ci-01-intro/xml/all_requests_except_bug.xml)
+[workflow_for_bug.xml](https://github.com/dmlorren/mnt-homeworks/blob/MNT-video/09-ci-01-intro/xml/workflow_for_bug.xml)
 
 ---
 
