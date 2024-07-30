@@ -10,7 +10,6 @@
 6. Создайте VM (2CPU4RAM) и запустите [playbook](./infrastructure).
 
 
-
 Подготовлены виртуальные машины:
 <img src="img/09_05_1.png">
 
@@ -36,16 +35,16 @@ ansible-playbook site.yml -i inventory/cicd/hosts.yml
 ## Основная часть
 
 1. Создайте новый проект в teamcity на основе fork.
-<img src="img/09_05_5.png"
+<img src="img/09_05_5.png">
 
 2. Сделайте autodetect конфигурации.
-<img src="img/09_05_6.png"
+<img src="img/09_05_6.png">
 
 3. Сохраните необходимые шаги, запустите первую сборку master.
-<img src="img/09_05_7.png"
+<img src="img/09_05_7.png">
 
 4. Поменяйте условия сборки: если сборка по ветке `master`, то должен происходит `mvn clean deploy`, иначе `mvn clean test`.
-<img src="img/09_05_8.png"
+<img src="img/09_05_8.png">
 
 5. Для deploy будет необходимо загрузить [settings.xml](./teamcity/settings.xml) в набор конфигураций maven у teamcity, предварительно записав туда креды для подключения к nexus.
 <img src="img/09_05_9.png">
@@ -105,6 +104,7 @@ git push https://github.com/dmlorren/example-teamcity master
 
 Ссылки:
 https://github.com/dmlorren/example-teamcity
+
 https://github.com/dmlorren/mnt-homeworks/blob/MNT-video/09-ci-05-teamcity/README.md
 
 ---
