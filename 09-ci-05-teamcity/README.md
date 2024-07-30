@@ -1,4 +1,4 @@
-# Домашнее задание к занятию 11 «Teamcity»
+# Домашнее задание к занятию 11 «Teamcity» - Иванов Дмитрий (fops-13)
 
 ## Подготовка к выполнению
 
@@ -106,11 +106,5 @@ git push https://github.com/dmlorren/example-teamcity master
 https://github.com/dmlorren/example-teamcity
 
 https://github.com/dmlorren/mnt-homeworks/blob/MNT-video/09-ci-05-teamcity/README.md
-
----
-
-### Как оформить решение задания
-
-Выполненное домашнее задание пришлите в виде ссылки на .md-файл в вашем репозитории.
 
 ---
