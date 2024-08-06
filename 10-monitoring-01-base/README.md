@@ -133,13 +133,6 @@ Pull модель:
 P.S.: если при запуске некоторые контейнеры будут падать с ошибкой - проставьте им режим `Z`, например
 `./data:/var/lib:Z`
 
-
-
-
-
-
-
-
 #
 8. Перейдите в веб-интерфейс Chronograf (http://localhost:8888) и откройте вкладку Data explorer.
         
@@ -149,12 +142,6 @@ P.S.: если при запуске некоторые контейнеры б�
     - Вверху вы можете увидеть запрос, аналогичный SQL-синтаксису. Поэкспериментируйте с запросом, попробуйте изменить группировку и интервал наблюдений.
 
 Для выполнения задания приведите скриншот с отображением метрик утилизации cpu из веб-интерфейса.
-
-
-
-
-
-
 
 #
 9. Изучите список [telegraf inputs](https://github.com/influxdata/telegraf/tree/master/plugins/inputs). 
@@ -184,8 +171,142 @@ P.S.: если при запуске некоторые контейнеры б�
 После настройке перезапустите telegraf, обновите веб интерфейс и приведите скриншотом список `measurments` в 
 веб-интерфейсе базы telegraf.autogen . Там должны появиться метрики, связанные с docker.
 
-Факультативно можете изучить какие метрики собирает telegraf после выполнения данного задания.
 
+### Ответ для 7,8,9:
+
+Ключевым моментом настройки является образ для хронографа, вместо image: "chrono_config" нужно указать image: "chronograf" иначе не получится сбилдить контейнер.
+
+Ещё один момент для influxdb нужно явно прокинуть тэг 1.8 (нашёл ответ в гите) не только в docker-compose.yml, но и в "sandbox" и в ".env"
+
+Так же потребовалось выполнять пачку команд (во множестве попыток запуска):
+```
+sudo chmod -R 777 ./kapacitor/data
+sudo chmod -R 755 /var/lib/chronograf
+sudo chown -R 1000:1000 /var/lib/chronograf
+
+#при повторных перезапусках
+sudo rm -rf /var/lib/chronograf/data/chronograf-v1.db
+```
+
+Файл docker-compose подвергнутый доработки (возможно даже не финальный вариант):
+```
+version: '3.8'
+services:
+  influxdb:
+    # Full tag list: https://hub.docker.com/r/library/influxdb/tags/
+    build:
+      context: ./images/influxdb/
+      dockerfile: ./${TYPE}/Dockerfile
+      args:
+        INFLUXDB_TAG: ${INFLUXDB_TAG}
+    image: "influxdb:1.8"
+    privileged: true 
+    volumes:
+      # Mount for influxdb data directory
+      - ./influxdb/data:/var/lib/influxdb:Z
+      # Mount for influxdb configuration
+      - ./influxdb/config/influxdb.conf:/etc/influxdb/influxdb.conf:Z
+    ports:
+      # The API for InfluxDB is served on port 8086
+      - "8086:8086"
+      - "8082:8082"
+      # UDP Port
+      - "8089:8089/udp"
+    networks:
+      - influx_network
+
+  telegraf:
+    # Full tag list: https://hub.docker.com/r/library/telegraf/tags/
+    build:
+      context: ./images/telegraf/
+      dockerfile: ./${TYPE}/Dockerfile
+      args:
+        TELEGRAF_TAG: ${TELEGRAF_TAG}
+    image: "telegraf:1.4.0"
+    environment:
+      HOSTNAME: "telegraf-getting-started"
+    # Telegraf requires network access to InfluxDB
+    links:
+      - influxdb
+    privileged: true  
+    volumes:
+      # Mount for telegraf configuration
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:Z
+      # Mount for Docker API access
+      - /var/run/docker.sock:/var/run/docker.sock:Z
+    depends_on:
+      - influxdb
+    ports:
+      - "8092:8092/udp"
+      - "8094:8094"
+      - "8125:8125/udp"
+    networks:
+      - influx_network
+
+  kapacitor:
+  # Full tag list: https://hub.docker.com/r/library/kapacitor/tags/
+    build:
+      context: ./images/kapacitor/
+      dockerfile: ./${TYPE}/Dockerfile
+      args:
+        KAPACITOR_TAG: ${KAPACITOR_TAG}
+    image: "kapacitor"
+    privileged: true 
+    volumes:
+      # Mount for kapacitor data directory
+      - ./kapacitor/data/:/var/lib/kapacitor:Z
+      # Mount for kapacitor configuration
+      - ./kapacitor/config/:/etc/kapacitor/config/kapacitor.conf:Z
+    # Kapacitor requires network access to Influxdb
+    links:
+      - influxdb
+    ports:
+      # The API for Kapacitor is served on port 9092
+      - "9092:9092"   
+    depends_on:
+      - influxdb
+    networks:
+      - influx_network
+
+
+  chronograf:
+    # Full tag list: https://hub.docker.com/r/library/chronograf/tags/
+    build:
+      context: ./images/chronograf
+      dockerfile: ./${TYPE}/Dockerfile
+      args:
+        CHRONOGRAF_TAG: ${CHRONOGRAF_TAG}
+    image: "chronograf"
+    environment:
+      RESOURCES_PATH: "/usr/share/chronograf/resources"
+    privileged: true 
+    volumes:
+      # Mount for chronograf database
+      - ./chronograf/data/:/var/lib/chronograf/:Z
+    links:
+      # Chronograf requires network access to InfluxDB and Kapacitor
+      - influxdb
+      - kapacitor
+    ports:
+      # The WebUI for Chronograf is served on port 8888
+      - "8888:8888"
+    depends_on:
+      - kapacitor
+      - influxdb
+      - telegraf
+    networks:
+      - influx_network
+
+  documentation:
+    build:
+      context: ./documentation
+    ports:
+      - "3010:3000"
+
+networks:
+  influx_network:
+```
+<img src="img/monitoring_01.png">
+<img src="img/monitoring_02.png">
 
 ---
-
