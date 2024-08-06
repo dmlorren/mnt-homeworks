@@ -306,7 +306,7 @@ services:
 networks:
   influx_network:
 ```
-<img src="img/monitoring_001.png">
+
 <img src="img/monitoring_002.png">
 
 ---
